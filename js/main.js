@@ -11,7 +11,10 @@ const API_BASE = "/api/[...route]";
 function encryptMessage(text){
   try{
     if(!text) return text;
-    return btoa(unescape(encodeURIComponent(text)));
+    const bytes = new TextEncoder().encode(text);
+    let binary = "";
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary);
   }catch(e){
     return text;
   }
@@ -21,10 +24,13 @@ function decryptMessage(text){
   try{
     if(!text) return text;
     if(!/^[A-Za-z0-9+/=]+$/.test(text)) return text;
-    return decodeURIComponent(escape(atob(text)));
+    const binary = atob(text);
+    const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
+    return new TextDecoder().decode(bytes);
   }catch(e){
     return text;
   }
+}
 }
 
 function buildApiUrl(route, query = {}) {
