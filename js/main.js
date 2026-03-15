@@ -44,6 +44,25 @@ let currentProfile = {
   avatar_url: null
 };
 
+
+/* =========================
+   SIMPLE CLIENT CRYPTO
+========================= */
+function encryptMessage(text){
+  try{
+    return btoa(unescape(encodeURIComponent(text)));
+  }catch(e){
+    return text;
+  }
+}
+
+function decryptMessage(text){
+  try{
+    return decodeURIComponent(escape(atob(text)));
+  }catch(e){
+    return text;
+  }
+}
 const BASE_TITLE = "Página Inicial - Workday";
 const SEEN_KEY = "wd_lastSeenAt";
 const BADGE_KEY = "wd_badgeCount";
@@ -1023,7 +1042,7 @@ function clearReplySelection() {
 function setReplyFromMessage(msg, element) {
   if (!msg || !msg.id) return;
 
-  const text = (msg.content || msg.message || "").trim();
+  const text = decryptMessage(msg.content || msg.message || "").trim();
   const hasImage = !!msg.image_url;
   const snippet = text
     ? (text.length > 80 ? text.slice(0, 80) + "…" : text)
@@ -1598,7 +1617,7 @@ async function sendPublicMessage(text) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: loggedUser,
-      content: content || "🖼 Imagem",
+      content: encryptMessage(content || "🖼 Imagem"),
       image_url: pendingImageUrl,
       to,
       reply_to: replyState?.id ?? null,
@@ -1626,7 +1645,7 @@ async function sendDmMessage(text) {
   const basePayload = {
     room: currentRoom,
     sender: loggedUser,
-    message: text || "🖼 Imagem",
+    message: encryptMessage(text || "🖼 Imagem"),
     image_url: pendingImageUrl
   };
 
