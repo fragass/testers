@@ -4,6 +4,29 @@ const IMAGE_READY_PLACEHOLDER = "📎 imagem anexada";
 
 const API_BASE = "/api/[...route]";
 
+
+/* =========================
+   MESSAGE ENCRYPTION
+========================= */
+function encryptMessage(text){
+  try{
+    if(!text) return text;
+    return btoa(unescape(encodeURIComponent(text)));
+  }catch(e){
+    return text;
+  }
+}
+
+function decryptMessage(text){
+  try{
+    if(!text) return text;
+    if(!/^[A-Za-z0-9+/=]+$/.test(text)) return text;
+    return decodeURIComponent(escape(atob(text)));
+  }catch(e){
+    return text;
+  }
+}
+
 function buildApiUrl(route, query = {}) {
   const cleanRoute = String(route || "").replace(/^\/+|\/+$/g, "");
   const params = new URLSearchParams();
@@ -44,25 +67,6 @@ let currentProfile = {
   avatar_url: null
 };
 
-
-/* =========================
-   SIMPLE CLIENT CRYPTO
-========================= */
-function encryptMessage(text){
-  try{
-    return btoa(unescape(encodeURIComponent(text)));
-  }catch(e){
-    return text;
-  }
-}
-
-function decryptMessage(text){
-  try{
-    return decodeURIComponent(escape(atob(text)));
-  }catch(e){
-    return text;
-  }
-}
 const BASE_TITLE = "Página Inicial - Workday";
 const SEEN_KEY = "wd_lastSeenAt";
 const BADGE_KEY = "wd_badgeCount";
